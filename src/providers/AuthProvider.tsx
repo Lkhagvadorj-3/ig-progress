@@ -9,11 +9,11 @@ import {
   useState,
 } from "react";
 type User = {
-  username: String;
-  email: String;
-  password: String;
-  bio: String | null;
-  profilePicture: String | null;
+  username: string;
+  email: string;
+  password: string;
+  bio: string | null;
+  profilePicture: string | null;
 };
 type AuthContext = {
   user: User | null;

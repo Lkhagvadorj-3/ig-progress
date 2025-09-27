@@ -10,7 +10,7 @@ type logintype = {
   email: string;
   pass: string;
 };
-const page = () => {
+const Page = () => {
   const { push } = useRouter();
   const { setUser, user } = useUser();
   const [inputValue, setInputValue] = useState<logintype>({
@@ -48,7 +48,6 @@ const page = () => {
     }
   };
 
-  //sonner hiiiiii!!!(rich color:true) SIGN UP aaaa hiii!!!!
   useEffect(() => {
     if (user) push("/");
   }, []);
@@ -85,7 +84,7 @@ const page = () => {
         </Button>
       </div>
       <div className="flex">
-        <div>Don't have an account ?</div>
+        <div>Dont have an account ?</div>
         <div
           className="text-blue-400"
           onClick={() => {
@@ -98,4 +97,4 @@ const page = () => {
     </div>
   );
 };
-export default page;
+export default Page;

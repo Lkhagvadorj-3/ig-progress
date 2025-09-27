@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-const page = () => {
+const Page = () => {
   const router = useRouter();
   return (
     <div>
@@ -31,4 +31,4 @@ const page = () => {
     </div>
   );
 };
-export default page;
+export default Page;

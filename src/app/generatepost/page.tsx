@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-const page = () => {
+const Page = () => {
   const router = useRouter();
   const [prompt, setPromt] = useState("");
   const [imageurl, setImageurl] = useState("");
@@ -69,7 +69,7 @@ const page = () => {
           Explore AI generated images
         </h1>
         <h2 className="font-semibold text-1xl opacity-50 pl-3">
-          Describe what's on your mind.For best results , be specific{" "}
+          Describe whats on your mind.For best results , be specific{" "}
         </h2>
       </div>
       <div className="flex flex-col gap-5 items-center">
@@ -123,4 +123,4 @@ const page = () => {
     </div>
   );
 };
-export default page;
+export default Page;

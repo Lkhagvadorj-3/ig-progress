@@ -11,7 +11,7 @@ type signuptype = {
   email: string;
   pass: string;
 };
-const page = () => {
+const Page = () => {
   const { push } = useRouter();
   const [inputValue, setInputValue] = useState<signuptype>({
     username: "",
@@ -101,4 +101,4 @@ const page = () => {
     </div>
   );
 };
-export default page;
+export default Page;
