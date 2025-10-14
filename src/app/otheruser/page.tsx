@@ -14,40 +14,66 @@ import {
 } from "@/components/ui/card";
 import { Heart, HeartCrack } from "lucide-react";
 import { toast } from "sonner";
+type User = {
+  _id: string;
+  username: string;
+  followers: any[];
+  following: any[];
+  email: string;
+  password: string;
+  bio: string | null;
+  profilePicture: string | null;
+};
 
-export default function Home() {
+export default function Page() {
   const { push } = useRouter();
   const { user, token } = useUser();
   const [posts, setPosts] = useState<any[]>([]);
+  const [herglgc, setHerglgc] = useState<User | null>(null);
+
+  if (user?._id === herglgc?._id) {
+    push("/profile");
+    return;
+  }
+
   const viewpost = async () => {
-    const response = await fetch("http://localhost:5555/posts/posts", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      "http://localhost:5555/posts/otheruser/68de44080999506398872c64",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     const data = await response.json();
     setPosts(data);
+    console.log(data);
+  };
+  const viewdata = async () => {
+    const response = await fetch(
+      "http://localhost:5555/users/68de44080999506398872c64",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const data = await response.json();
+    setHerglgc(data);
     console.log(data);
   };
 
   useEffect(() => {
     viewpost();
-  }, []);
-
-  useEffect(() => {
-    if (!user) push("/login");
+    viewdata();
   }, []);
 
   const usreh = () => {
-    push("/createpost");
-  };
-  const pro = () => {
-    push("/profile");
-  };
-  const viewOthers = () => {
-    push("/otheruser");
+    push("/");
   };
   const postlike = async (postId: string) => {
     const response = await fetch(
@@ -83,89 +109,72 @@ export default function Home() {
       toast.error("ARAICDE BRO");
     }
   };
+
   console.log(posts);
   return (
     <div>
+      {" "}
       <div>
         {" "}
-        <h1 className="font-semibold text-3xl fixed text-cyan-500">LAVDEV</h1>
-      </div>
-      <div className="p-9 flex justify-around font-semibold text-3xl text-yellow-500">
-        HELLO <div className="text-pink-500">{user?.username}</div>{" "}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="45"
-          height="45"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-baby-icon lucide-baby text-green-500"
-          onClick={() => {
-            pro();
-          }}
-        >
-          <path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5" />
-          <path d="M15 12h.01" />
-          <path d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1" />
-          <path d="M9 12h.01" />
-        </svg>
-      </div>
-      <div className=" flex justify-end ">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="45"
-          height="45"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-diamond-plus-icon lucide-diamond-plus text-green-500"
+        <h1
+          className="font-semibold text-3xl fixed m-0 p-0"
           onClick={() => {
             usreh();
           }}
         >
-          <path d="M12 8v8" />
-          <path d="M2.7 10.3a2.41 2.41 0 0 0 0 3.41l7.59 7.59a2.41 2.41 0 0 0 3.41 0l7.59-7.59a2.41 2.41 0 0 0 0-3.41L13.7 2.71a2.41 2.41 0 0 0-3.41 0z" />
-          <path d="M8 12h8" />
-        </svg>
-      </div>
-      <div>
-        <h1 className="font-semibold text-2xl flex justify-center mb-5 ">
-          FEED
+          LAVDEV
         </h1>
+      </div>
+      <div className="flex flex-col gap-10">
+        <div className="flex flex-col items-center">
+          {" "}
+          <h1 className="font-semibold text-2xl pt-10">{herglgc?.username}</h1>
+          <img
+            src="/IMG_0059.jpg"
+            className="w-[77px] h-[77px] border rounded-full"
+          />
+        </div>
+        <h1>{user?.bio}</h1>
+        <div className="flex justify-center">
+          <Button
+            className="w-30 bg-green-500"
+            onClick={() => follow(herglgc!._id)}
+          >
+            FOLLOW
+          </Button>
+        </div>
+
+        <div>
+          <div className="flex gap-5 justify-center items-center">
+            <div>
+              <h1 className="flex justify-center">{posts.length}</h1>
+              <h1>POSTS</h1>
+            </div>
+            <div>
+              <h1 className="flex justify-center">
+                {herglgc?.followers.length}
+              </h1>
+              <h1>FOLLOWERS</h1>
+            </div>
+            <div>
+              <h1 className="flex justify-center">
+                {herglgc?.following.length}
+              </h1>
+              <h1>FOLLOWING</h1>
+            </div>
+          </div>
+        </div>
       </div>
       <div>
         {posts.map((pos, index) => {
           return (
-            <div key={pos._id} className="flex flex-col items-center">
-              <Card className="bg-blue-600">
+            <div key={index} className="flex flex-col items-center ">
+              <Card>
                 <CardHeader>
-                  <CardTitle className="flex">
-                    <img
-                      src="/IMG_0059.jpg"
-                      className="w-[44px] h-[44px] border rounded-full"
-                      onClick={() => viewOthers()}
-                    />
-                    <h1 onClick={() => viewOthers()}>{pos.user.username}</h1>
-                  </CardTitle>
+                  <CardTitle>{herglgc?.username}</CardTitle>
                   <CardDescription className="text-black font-semibold text-2xl">
                     {pos.caption}
                   </CardDescription>
-                  <CardAction>
-                    <div onClick={() => follow(pos.user._id)}>
-                      {" "}
-                      {pos.user.followers.includes(user!._id) ? (
-                        <Button className="bg-purple-500 ">UNFOLLOW</Button>
-                      ) : (
-                        <Button className="bg-green-500 ">FOLLOW</Button>
-                      )}
-                    </div>
-                  </CardAction>
                 </CardHeader>
                 <CardContent>
                   <img src={pos.images} className="w-[400px] h-[400px]" />
@@ -179,7 +188,6 @@ export default function Home() {
                         <HeartCrack />
                       )}
                     </div>
-
                     <div>{pos.likes.length}</div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

@@ -5,14 +5,28 @@ import { useRouter } from "next/navigation";
 import { useState, ChangeEvent, useEffect } from "react";
 import { useUser } from "@/providers/AuthProvider";
 import { toast } from "sonner";
+import { jwtDecode } from "jwt-decode";
 
 type logintype = {
   email: string;
   pass: string;
 };
+type User = {
+  _id: string;
+  username: string;
+  email: string;
+  password: string;
+  bio: string | null;
+  profilePicture: string | null;
+};
+
+type decodedTokenType = {
+  data: User;
+};
+
 const Page = () => {
   const { push } = useRouter();
-  const { setUser, user } = useUser();
+  const { setUser, user, token, setToken } = useUser();
   const [inputValue, setInputValue] = useState<logintype>({
     email: "",
     pass: "",
@@ -38,11 +52,13 @@ const Page = () => {
       }),
     });
     if (response.ok) {
-      const user = await response.json();
-      localStorage.setItem("user", JSON.stringify(user));
-      setUser(user);
-      push("/");
+      const token = await response.json();
+      localStorage.setItem("token", token);
+      setToken(token);
+      const decodedToken: decodedTokenType = jwtDecode(token);
+      setUser(decodedToken.data);
       toast.success("Logged in successfully");
+      push("/");
     } else {
       toast.error("Email or Password incorrect .TRY AGAIN");
     }

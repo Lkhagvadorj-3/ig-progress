@@ -3,13 +3,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
+import { useUser } from "@/providers/AuthProvider";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "sonner";
+
+type User = {
+  _id: string;
+  username: string;
+  email: string;
+  password: string;
+  bio: string | null;
+  profilePicture: string | null;
+};
+
 const Page = () => {
   const router = useRouter();
   const [prompt, setPromt] = useState("");
   const [imageurl, setImageurl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { setUser, user, token } = useUser();
+  const [caption, setCaption] = useState("");
   const HF_API_TOKEN = process.env.HF_API_TOKEN;
+
   const createImage = async () => {
     if (!prompt.trim()) return;
     setIsLoading(true);
@@ -40,20 +56,44 @@ const Page = () => {
       }
       const blob = await response.blob();
       const imageURL = URL.createObjectURL(blob);
-      setImageurl(imageURL);
 
       const file = new File([blob], "generated.png", { type: "image/png" });
       const uploaded = await upload(file.name, file, {
         access: "public",
         handleUploadUrl: "api/upload",
       });
+      setImageurl(uploaded.url);
+
+      console.log(uploaded);
     } catch (err) {
       setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
-    console.log(imageurl);
   };
+  const postUusgeh = async () => {
+    const response = await fetch("http://localhost:5555/posts/createPost", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        images: [imageurl],
+        caption: caption,
+        userId: user?._id,
+      }),
+    });
+    if (response.ok) {
+      toast.success("POSTED SUCCESSFULLY");
+      router.push("/");
+    } else {
+      toast.error("SOMETHING HAPPENNED PLEASE TRY AGAIN...");
+    }
+  };
+  console.log(token);
   return (
-    <div className="flex flex-col gap-30">
+    <div className="flex flex-col gap-10">
       <div className="flex gap-30 p-3">
         <h1
           onClick={() => {
@@ -120,6 +160,25 @@ const Page = () => {
           </div>
         </div>
       )}
+      <div className="flex flex-col justify-center gap-5">
+        <input
+          placeholder="WRITE CAPTION"
+          onChange={(e) => {
+            setCaption(e.target.value);
+          }}
+          value={caption}
+          name="caption"
+          className="w-full bg-cyan-100"
+        />
+        <Button
+          onClick={() => {
+            postUusgeh();
+          }}
+          className="w-full"
+        >
+          CREATE POST
+        </Button>
+      </div>
     </div>
   );
 };

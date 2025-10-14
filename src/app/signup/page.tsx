@@ -5,14 +5,30 @@ import { useRouter } from "next/navigation";
 import { useState, ChangeEvent } from "react";
 import { useUser } from "@/providers/AuthProvider";
 import { toast } from "sonner";
+import { jwtDecode } from "jwt-decode";
 
 type signuptype = {
   username: string;
   email: string;
   pass: string;
 };
+type User = {
+  _id: string;
+  username: string;
+  email: string;
+  password: string;
+  bio: string | null;
+  profilePicture: string | null;
+};
+
+type decodedTokenType = {
+  data: User;
+};
+
 const Page = () => {
   const { push } = useRouter();
+  const { setUser, user, token, setToken } = useUser();
+
   const [inputValue, setInputValue] = useState<signuptype>({
     username: "",
     email: "",
@@ -43,8 +59,16 @@ const Page = () => {
         password: inputValue.pass,
       }),
     });
-    push("/login");
-    toast.success("Created your account successfully");
+    if (response.ok) {
+      const token = await response.json();
+      localStorage.setItem("token", token);
+      setToken(token);
+      const decodedToken: decodedTokenType = jwtDecode(token);
+      setUser(decodedToken.data);
+
+      push("/login");
+      toast.success("Created your account successfully");
+    }
   };
 
   const jump = () => {

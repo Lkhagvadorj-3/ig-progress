@@ -8,7 +8,9 @@ import {
   useEffect,
   useState,
 } from "react";
+import { jwtDecode } from "jwt-decode";
 type User = {
+  _id: string;
   username: string;
   email: string;
   password: string;
@@ -18,35 +20,27 @@ type User = {
 type AuthContext = {
   user: User | null;
   setUser: Dispatch<SetStateAction<null | User>>;
-  login: (password: string, email: string) => Promise<void>;
+  setToken: Dispatch<SetStateAction<null | string>>;
+  token: string | null;
+};
+type decodedTokenType = {
+  data: User;
 };
 export const AuthContext = createContext<AuthContext | null>(null);
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
+    const localtoken = localStorage.getItem("token");
+    if (localtoken) {
+      const decodedToken: decodedTokenType = jwtDecode(localtoken);
+      setUser(decodedToken.data);
+      setToken(localtoken);
     }
   }, []);
-  const login = async (email: string, password: string) => {
-    const response = await fetch("http://localhost:5555/log-in", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-    });
-    const user = await response.json();
-    localStorage.setItem("user", JSON.stringify(user));
-    setUser(user);
-  };
-  const values = { user: user, setUser: setUser, login: login };
+  const values = { user, setUser, setToken, token };
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
 };
 export const useUser = () => {
