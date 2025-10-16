@@ -30,11 +30,7 @@ export default function Page() {
   const { user, token } = useUser();
   const [posts, setPosts] = useState<any[]>([]);
   const [herglgc, setHerglgc] = useState<User | null>(null);
-
-  if (user?._id === herglgc?._id) {
-    push("/profile");
-    return;
-  }
+  const userId = herglgc?._id;
 
   const viewpost = async () => {
     const response = await fetch(
