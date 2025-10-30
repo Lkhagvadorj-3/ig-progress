@@ -12,13 +12,36 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Heart, HeartCrack } from "lucide-react";
+import { Heart, HeartCrack, MessageCircle, Share } from "lucide-react";
 import { toast } from "sonner";
+import { Menu } from "@/_components/page";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+type User = {
+  _id: string;
+  username: string;
+  followers: string[]; // better to type as string[] if possible
+  following: string[];
+  email: string;
+  password: string;
+  bio: string | null;
+  profilePicture: string | null;
+};
+
+type posttype = {
+  _id: string;
+  caption: string;
+  createdAt: Date;
+  images: string[];
+  likes: string[];
+  updatedAt: Date;
+  user: User;
+};
 
 export default function Home() {
   const { push } = useRouter();
   const { user, token } = useUser();
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<posttype[]>([]);
+
   const viewpost = async () => {
     const response = await fetch("http://localhost:5555/posts/posts", {
       method: "GET",
@@ -29,7 +52,6 @@ export default function Home() {
     });
     const data = await response.json();
     setPosts(data);
-    console.log(data);
   };
 
   useEffect(() => {
@@ -40,15 +62,6 @@ export default function Home() {
     if (!user) push("/login");
   }, []);
 
-  const usreh = () => {
-    push("/createpost");
-  };
-  const pro = () => {
-    push("/profile");
-  };
-  const viewOthers = () => {
-    push("/otheruser");
-  };
   const postlike = async (postId: string) => {
     const response = await fetch(
       `http://localhost:5555/posts/toggle-like/${postId}`,
@@ -61,10 +74,11 @@ export default function Home() {
       }
     );
     if (response.ok) {
-      toast.success("LIKED POST");
+      toast.success("Liked Post");
       await viewpost();
     }
   };
+
   const follow = async (followedUserId: string) => {
     const response = await fetch(
       `http://localhost:5555/toggle-follow/${followedUserId}`,
@@ -77,146 +91,103 @@ export default function Home() {
       }
     );
     if (response.ok) {
-      toast.success("FOLLOWED");
+      toast.success("Followed");
       await viewpost();
     } else {
-      toast.error("ARAICDE BRO");
+      toast.error("Something went wrong");
     }
   };
   console.log(posts);
   return (
-    <div>
-      <div>
-        {" "}
-        <h1 className="font-semibold text-3xl fixed text-cyan-500">LAVDEV</h1>
-      </div>
-      <div className="p-9 flex justify-around font-semibold text-3xl text-yellow-500">
-        HELLO <div className="text-pink-500">{user?.username}</div>{" "}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="45"
-          height="45"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-baby-icon lucide-baby text-green-500"
-          onClick={() => {
-            pro();
-          }}
-        >
-          <path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5" />
-          <path d="M15 12h.01" />
-          <path d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1" />
-          <path d="M9 12h.01" />
-        </svg>
-      </div>
-      <div className=" flex justify-end ">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="45"
-          height="45"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-diamond-plus-icon lucide-diamond-plus text-green-500"
-          onClick={() => {
-            usreh();
-          }}
-        >
-          <path d="M12 8v8" />
-          <path d="M2.7 10.3a2.41 2.41 0 0 0 0 3.41l7.59 7.59a2.41 2.41 0 0 0 3.41 0l7.59-7.59a2.41 2.41 0 0 0 0-3.41L13.7 2.71a2.41 2.41 0 0 0-3.41 0z" />
-          <path d="M8 12h8" />
-        </svg>
-      </div>
-      <div>
-        <h1 className="font-semibold text-2xl flex justify-center mb-5 ">
-          FEED
-        </h1>
-      </div>
-      <div>
-        {posts.map((pos, index) => {
-          return (
-            <div key={pos._id} className="flex flex-col items-center">
-              <Card className="bg-blue-600">
-                <CardHeader>
-                  <CardTitle className="flex">
-                    <img
-                      src="/IMG_0059.jpg"
-                      className="w-[44px] h-[44px] border rounded-full"
-                      onClick={() => viewOthers()}
-                    />
-                    <h1 onClick={() => viewOthers()}>{pos.user.username}</h1>
-                  </CardTitle>
-                  <CardDescription className="text-black font-semibold text-2xl">
-                    {pos.caption}
-                  </CardDescription>
-                  <CardAction>
-                    <div onClick={() => follow(pos.user._id)}>
-                      {" "}
-                      {pos.user.followers.includes(user!._id) ? (
-                        <Button className="bg-purple-500 ">UNFOLLOW</Button>
-                      ) : (
-                        <Button className="bg-green-500 ">FOLLOW</Button>
-                      )}
-                    </div>
-                  </CardAction>
-                </CardHeader>
-                <CardContent>
-                  <img src={pos.images} className="w-[400px] h-[400px]" />
-                </CardContent>
-                <CardFooter>
-                  <div className="flex gap-5">
-                    <div onClick={() => postlike(pos._id)}>
-                      {pos.likes.includes(user?._id) ? (
-                        <Heart color="red" fill="red" />
-                      ) : (
-                        <HeartCrack />
-                      )}
-                    </div>
+    <div className="min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-white p-6">
+      <h1
+        className="text-4xl font-bold text-cyan-400 drop-shadow-neon fixed top-4 left-6 z-50"
+        onClick={() => push("https://www.instagram.com/lkhagva.dorj_/")}
+      >
+        LAVDEV
+      </h1>
 
-                    <div>{pos.likes.length}</div>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="lucide lucide-shell-icon lucide-shell"
-                    >
-                      <path d="M14 11a2 2 0 1 1-4 0 4 4 0 0 1 8 0 6 6 0 0 1-12 0 8 8 0 0 1 16 0 10 10 0 1 1-20 0 11.93 11.93 0 0 1 2.42-7.22 2 2 0 1 1 3.16 2.44" />
-                    </svg>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="lucide lucide-square-arrow-out-up-right-icon lucide-square-arrow-out-up-right"
-                    >
-                      <path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" />
-                      <path d="m21 3-9 9" />
-                      <path d="M15 3h6v6" />
-                    </svg>
-                  </div>
-                </CardFooter>
-              </Card>
-            </div>
-          );
-        })}
+      <div className="pt-20 text-center text-3xl font-semibold text-yellow-400">
+        Hello, <span className="text-pink-400">{user?.username}</span>
+      </div>
+
+      <h2 className="text-center text-2xl mt-8 mb-6 font-bold text-white">
+        Feed
+      </h2>
+
+      <div className="space-y-12 flex flex-col items-center">
+        {posts.map((pos) => (
+          <Card
+            key={pos._id}
+            className="w-full max-w-2xl backdrop-blur-md bg-white/5 border border-white/10 rounded-xl shadow-neon"
+          >
+            <CardHeader className="flex items-center gap-4">
+              <Avatar
+                onClick={() => push(`/otheruser/${pos.user._id}`)}
+                className="cursor-pointer ring-2 ring-cyan-400 hover:ring-pink-500 transition-all"
+              >
+                <AvatarImage src={pos.user.profilePicture!} />
+                <AvatarFallback>{pos.user.username[0]}</AvatarFallback>
+              </Avatar>
+              <CardTitle
+                onClick={() => push(`/otheruser/${pos.user._id}`)}
+                className="text-white transition-all"
+              >
+                {pos.user.username}
+              </CardTitle>
+            </CardHeader>
+            <CardAction className="px-6 pb-2">
+              <Button
+                className={`transition-all ${
+                  pos.user.followers.includes(user!._id)
+                    ? "bg-purple-500 hover:bg-purple-600"
+                    : "bg-green-500 hover:bg-green-600"
+                }`}
+                onClick={() => follow(pos.user._id)}
+              >
+                {pos.user.followers.includes(user!._id) ? "Unfollow" : "Follow"}
+              </Button>
+            </CardAction>
+            <CardDescription className="px-6 text-lg text-white font-light italic">
+              {pos.caption}
+            </CardDescription>
+
+            <CardContent className="px-6 py-4">
+              <img
+                src={pos.images[0]}
+                alt="Post"
+                className="rounded-xl w-full h-[400px] object-cover border border-cyan-400 shadow-inner"
+              />
+            </CardContent>
+
+            <CardFooter className="flex items-center justify-between px-6 py-4">
+              <div className="flex items-center gap-5">
+                <div
+                  onClick={() => postlike(pos._id)}
+                  className="cursor-pointer"
+                >
+                  {pos.likes.includes(user!._id) ? (
+                    <Heart color="red" fill="red" />
+                  ) : (
+                    <HeartCrack color="white" />
+                  )}
+                </div>
+                <span className="text-sm text-gray-300">
+                  {pos.likes.length}
+                </span>
+                <MessageCircle
+                  onClick={() => push(`/comment/${pos._id}`)}
+                  className="text-white"
+                />
+                <Share className="text-white" />
+              </div>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+
+      <div className="fixed bottom-4 w-full">
+        <Menu />
       </div>
     </div>
   );

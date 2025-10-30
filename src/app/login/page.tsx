@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
@@ -11,6 +12,7 @@ type logintype = {
   email: string;
   pass: string;
 };
+
 type User = {
   _id: string;
   username: string;
@@ -26,91 +28,113 @@ type decodedTokenType = {
 
 const Page = () => {
   const { push } = useRouter();
-  const { setUser, user, token, setToken } = useUser();
+  const { setUser, user, setToken } = useUser();
+
   const [inputValue, setInputValue] = useState<logintype>({
     email: "",
     pass: "",
   });
+
   const handleLoginValues = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    if (name === "email") {
-      setInputValue({ ...inputValue, email: value });
-    }
-    if (name === "pass") {
-      setInputValue({ ...inputValue, pass: value });
-    }
+    setInputValue((prev) => ({ ...prev, [name]: value }));
   };
+
   const login = async () => {
-    const response = await fetch("http://localhost:5555/log-in", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: inputValue.email,
-        password: inputValue.pass,
-      }),
-    });
-    if (response.ok) {
-      const token = await response.json();
-      localStorage.setItem("token", token);
-      setToken(token);
-      const decodedToken: decodedTokenType = jwtDecode(token);
-      setUser(decodedToken.data);
-      toast.success("Logged in successfully");
-      push("/");
-    } else {
-      toast.error("Email or Password incorrect .TRY AGAIN");
+    if (!inputValue.email.trim() || !inputValue.pass.trim()) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+    try {
+      const response = await fetch("http://localhost:5555/log-in", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: inputValue.email,
+          password: inputValue.pass,
+        }),
+      });
+      if (response.ok) {
+        const token = await response.json();
+        localStorage.setItem("token", token);
+        setToken(token);
+        const decodedToken: decodedTokenType = jwtDecode(token);
+        setUser(decodedToken.data);
+        toast.success("Logged in successfully");
+        push("/");
+      } else {
+        toast.error("Email or Password incorrect. TRY AGAIN");
+      }
+    } catch {
+      toast.error("Network error. Please try again.");
     }
   };
 
   useEffect(() => {
     if (user) push("/");
-  }, []);
+  }, [user, push]);
 
   const usreh = () => {
     push("/signup");
   };
-  return (
-    <div className="flex flex-col justify-center items-center gap-20">
-      <h1 className="font-semibold text-3xl ">LAVDEV</h1>
 
-      <div className="flex flex-col gap-10">
+  return (
+    <div
+      className="min-h-screen flex flex-col justify-center items-center
+      bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-white px-6"
+    >
+      <h1 className="text-5xl font-extrabold mb-16 text-cyan-400 drop-shadow-neon select-none">
+        LAVDEV
+      </h1>
+
+      <div className="flex flex-col gap-8 w-full max-w-xs">
         <Input
           placeholder="ENTER YOUR EMAIL"
-          className="w-[250px]"
+          className="bg-[#121023] text-cyan-300 border-cyan-600 focus:border-pink-500 focus:ring-pink-500
+            rounded-lg px-4 py-3 placeholder-cyan-500
+            transition-shadow duration-300"
           name="email"
           value={inputValue.email}
-          onChange={(e) => handleLoginValues(e)}
+          onChange={handleLoginValues}
+          type="email"
+          spellCheck={false}
+          autoComplete="email"
         />
         <Input
           placeholder="ENTER YOUR PASSWORD"
-          className="w-[250px]"
+          className="bg-[#121023] text-cyan-300 border-cyan-600 focus:border-pink-500 focus:ring-pink-500
+            rounded-lg px-4 py-3 placeholder-cyan-500
+            transition-shadow duration-300"
           name="pass"
           value={inputValue.pass}
-          onChange={(e) => handleLoginValues(e)}
+          onChange={handleLoginValues}
+          type="password"
+          autoComplete="current-password"
         />
         <Button
-          className="w-[250px]"
-          onClick={() => {
-            login();
-          }}
+          onClick={login}
+          className="bg-gradient-to-r from-purple-600 to-blue-600
+            shadow-neon hover:shadow-pink-600
+            transition-transform duration-300 hover:scale-105
+            rounded-lg py-3 font-semibold text-lg"
         >
           Log in
         </Button>
       </div>
-      <div className="flex">
-        <div>Dont have an account ?</div>
-        <div
-          className="text-blue-400"
-          onClick={() => {
-            usreh();
-          }}
+
+      <div className="mt-12 flex gap-2 text-cyan-300 text-sm select-none">
+        <span>Dont have an account?</span>
+        <button
+          className="text-pink-500 font-semibold hover:underline hover:scale-105 transition-transform duration-200"
+          onClick={usreh}
         >
           SIGN UP
-        </div>
+        </button>
       </div>
     </div>
   );
 };
+
 export default Page;
