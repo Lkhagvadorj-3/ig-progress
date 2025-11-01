@@ -51,18 +51,21 @@ const Page = () => {
       toast.error("Please upload an image first.");
       return;
     }
-    const response = await fetch("http://localhost:5555/posts/createPost", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        images: imageurl,
-        caption,
-        userId: user?._id,
-      }),
-    });
+    const response = await fetch(
+      "https://lavdev-backend.onrender.com/posts/createPost",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          images: imageurl,
+          caption,
+          userId: user?._id,
+        }),
+      }
+    );
     if (response.ok) {
       toast.success("Posted successfully!");
       router.push("/");

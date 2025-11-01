@@ -46,12 +46,15 @@ export default function Page() {
 
   const fetchComments = async () => {
     try {
-      const res = await fetch(`http://localhost:5555/comment/get/${postId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `https://lavdev-backend.onrender.com/comment/get/${postId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!res.ok) throw new Error("Failed to fetch comments");
       const data: Comment[] = await res.json();
       setComments(data);
@@ -77,14 +80,17 @@ export default function Page() {
     }
 
     try {
-      const res = await fetch("http://localhost:5555/comment/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ postId, comment: commentText }),
-      });
+      const res = await fetch(
+        "https://lavdev-backend.onrender.com/comment/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ postId, comment: commentText }),
+        }
+      );
       if (!res.ok) throw new Error("Failed to submit comment");
       toast.success("Comment posted!");
       setCommentText("");

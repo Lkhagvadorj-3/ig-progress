@@ -43,13 +43,16 @@ export default function Home() {
   const [posts, setPosts] = useState<posttype[]>([]);
 
   const viewpost = async () => {
-    const response = await fetch("http://localhost:5555/posts/posts", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      "https://lavdev-backend.onrender.com/posts/posts",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     const data = await response.json();
     setPosts(data);
   };
@@ -64,7 +67,7 @@ export default function Home() {
 
   const postlike = async (postId: string) => {
     const response = await fetch(
-      `http://localhost:5555/posts/toggle-like/${postId}`,
+      `https://lavdev-backend.onrender.com/posts/toggle-like/${postId}`,
       {
         method: "POST",
         headers: {
@@ -81,7 +84,7 @@ export default function Home() {
 
   const follow = async (followedUserId: string) => {
     const response = await fetch(
-      `http://localhost:5555/toggle-follow/${followedUserId}`,
+      `https://lavdev-backend.onrender.com/toggle-follow/${followedUserId}`,
       {
         method: "POST",
         headers: {

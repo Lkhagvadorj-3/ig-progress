@@ -52,17 +52,20 @@ const Page = () => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:5555/sign-up", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: inputValue.username,
-          email: inputValue.email,
-          password: inputValue.pass,
-        }),
-      });
+      const response = await fetch(
+        "https://lavdev-backend.onrender.com/sign-up",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: inputValue.username,
+            email: inputValue.email,
+            password: inputValue.pass,
+          }),
+        }
+      );
       if (response.ok) {
         const token = await response.json();
         localStorage.setItem("token", token);

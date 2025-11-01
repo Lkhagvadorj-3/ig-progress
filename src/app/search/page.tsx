@@ -26,7 +26,7 @@ export default function Home() {
 
   const getUsers = async () => {
     const response = await fetch(
-      `http://localhost:5555/users/search/${inputValue}`,
+      `https://lavdev-backend.onrender.com/users/search/${inputValue}`,
       {
         method: "GET",
         headers: {

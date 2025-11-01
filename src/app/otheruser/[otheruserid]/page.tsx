@@ -45,25 +45,31 @@ export default function Page() {
   const userId = params.otheruserid;
 
   const fetchPosts = async () => {
-    const res = await fetch(`http://localhost:5555/posts/otheruser/${userId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await fetch(
+      `https://lavdev-backend.onrender.com/posts/otheruser/${userId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     const data = await res.json();
     setPosts(data);
   };
 
   const fetchUserData = async () => {
-    const res = await fetch(`http://localhost:5555/users/${userId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await fetch(
+      `https://lavdev-backend.onrender.com/users/${userId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     const data = await res.json();
     setProfileUser(data);
   };
@@ -76,7 +82,7 @@ export default function Page() {
   const goHome = () => push("/");
   const likePost = async (postId: string) => {
     const res = await fetch(
-      `http://localhost:5555/posts/toggle-like/${postId}`,
+      `https://lavdev-backend.onrender.com/posts/toggle-like/${postId}`,
       {
         method: "POST",
         headers: {
@@ -93,7 +99,7 @@ export default function Page() {
 
   const toggleFollow = async (followedUserId: string) => {
     const res = await fetch(
-      `http://localhost:5555/toggle-follow/${followedUserId}`,
+      `https://lavdev-backend.onrender.com/toggle-follow/${followedUserId}`,
       {
         method: "POST",
         headers: {
