@@ -23,36 +23,22 @@ const Page = () => {
     setIsLoading(true);
     setImageurl("");
     try {
-      const headers = {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${HF_API_TOKEN}`,
-      };
-      const response = await fetch(
-        `https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0`,
-        {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify({
-            inputs: prompt,
-            parameters: {
-              negative_prompt: "blurry, bad quality, distorted",
-              num_inference_steps: 20,
-              guidance_scale: 7.5,
-            },
-          }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error status: ${response.status}`);
-      }
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (!response.ok) throw new Error("Failed to generate");
+
       const blob = await response.blob();
+
       const file = new File([blob], "generated.png", { type: "image/png" });
 
-      // Upload to Vercel Blob Storage
       const uploaded = await upload(file.name, file, {
         access: "public",
-        handleUploadUrl: "api/upload",
+        handleUploadUrl: "/api/upload",
       });
+
       setImageurl(uploaded.url);
     } catch (err) {
       toast.error("Error generating image. Try again.");
