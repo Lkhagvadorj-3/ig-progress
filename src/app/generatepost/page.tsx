@@ -23,7 +23,7 @@ const Page = () => {
     setIsLoading(true);
     setImageurl("");
     try {
-      const response = await fetch("/api/generate/route.ts", {
+      const response = await fetch("/api/generate", {
         method: "POST",
         body: JSON.stringify({ prompt }),
       });
